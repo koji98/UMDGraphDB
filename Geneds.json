@@ -1,0 +1,73 @@
+{
+    "data":
+    [
+        {
+            "id": "FSAW",
+            "category": "Fundamental Studies",
+            "name": "Academic Writing"
+        },
+        {
+            "id": "FSAR",
+            "category": "Fundamental Studies",
+            "name": "Analytic Reasoning"
+        },
+        {
+            "id": "FSMA",
+            "category": "Fundamental Studies",
+            "name": "Math"
+        },
+        {
+            "id": "FSOC",
+            "category": "Fundamental Studies",
+            "name": "Oral Communications"
+        },
+        {
+            "id": "FSPW",
+            "category": "Fundamental Studies",
+            "name": "Professional Writing"
+        },
+
+        {
+            "id": "DSHS",
+            "category": "Distributive Studies",
+            "name": "History and Social Sciences"
+        },
+        {
+            "id": "DSHU",
+            "category": "Distributive Studies",
+            "name": "Humanities"
+        },
+        {
+            "id": "DSNS",
+            "category": "Distributive Studies",
+            "name": "Natural Sciences"
+        },
+        {
+            "id": "DSNL",
+            "category": "Distributive Studies",
+            "name": "Natural Science Lab"
+        },
+        {
+            "id": "DSSP",
+            "category": "Distributive Studies",
+            "name": "Scholarship in Practice"
+        },
+
+        {
+            "id": "DVCC",
+            "category": "Diversity",
+            "name": "Cultural Competency"
+        },
+        {
+            "id": "DVUP",
+            "category": "Diversity",
+            "name": "Understanding Plural Societies"
+        },
+
+        {
+            "id": "SCIS",
+            "category": "Signature Courses",
+            "name": "I-Series"
+        }
+    ]
+}
