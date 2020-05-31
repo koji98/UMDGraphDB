@@ -1,84 +1,55 @@
 import requests
-from neo4j import GraphDatabase, basic_auth
+import time
 
-driver = GraphDatabase.driver(
-    "bolt://52.3.248.178:34364", 
-    auth=basic_auth("neo4j", "tour-consequences-towns"))
-session = driver.session()
+class ProfessorDriver:
+    def __init__(self, session):
+        self._session = session
+        self._id = 0
 
-grabMoreProfessors = True
-pageNumber = 1
-
-# while (grabMoreProfessors):
-#     res = requests.get("https://api.umd.io/v1/professors?page=" + str(pageNumber))
-
-#     if(not(res)):
-#         grabMoreProfessors = False
-#     else:
-#         data = res.json()
-#         pageNumber = pageNumber + 1
-#         for professor in data:
-#             createProfessorCypher = """
-#                                     CREATE (p: Professor) 
-#                                     SET p.Name = \"{}\"
-#                                     """.format(professor["name"])
-
-#             # print(createProfessorCypher)
-
-#             results = session.run(createProfessorCypher, parameters={})
-
-#             for record in results:
-#                 print(record)
-
-#             matchProfessorCypher = """
-#                                    MATCH (prof: Professor {{Name: \"{}\"}}) 
-#                                    RETURN prof.Name
-#                                    """.format(professor["name"])
-
-#             # print(matchProfessorCypher)
-
-#             results = session.run(matchProfessorCypher, parameters={})
-
-#             for record in results:
-#                 print(record)
-
-#             for course in professor["taught"]:
-#                 createCourseCypher = """
-#                                      CREATE (c: Course)
-#                                      SET c.Course_Id = \"{}\", c.Semester = \"{}\"
-#                                      """.format(course["course_id"], course["semester"])
-
-#                 # print(createCourseCypher)
-
-#                 results = session.run(createCourseCypher, parameters={})
-
-#                 for record in results:
-#                     print(record)
-
-#                 matchCourseCypher = """
-#                                     MATCH (course: Course {{Course_Id: \"{}\"}})
-#                                     RETURN course.Course_Id
-#                                     """.format(course["course_id"])
-
-#                 # print(matchCourseCypher)
-
-#                 results = session.run(matchCourseCypher, parameters={})
-
-#                 for record in results:
-#                     print(record)
-
-#                 mergeProfessorCourseCypher = """
-#                                              MATCH (a:Professor), (b:Course)
-#                                              WHERE a.Name = \"{}\" AND b.Course_Id = \"{}\" AND b.Semester = \"{}\"
-#                                              CREATE (a)-[r:TAUGHT]->(b)
-#                                              RETURN r
-#                                              """.format(professor["name"], course["course_id"], course["semester"])
-
-#                 print(mergeProfessorCourseCypher)
-
-#                 results = session.run(mergeProfessorCourseCypher, parameters={})
-
-#                 for record in results:
-#                     print(record)
+    def __create_professor(self, professor):
+        for course in professor["taught"]:
+            query = """
+                    MATCH (c:Course{id: $course_id}) -[:DURING]-> (s:Semester{id: $semester_id})
+                    MERGE (p:Professor{id: $professor_id, name: $professor_name}), 
+                    (p) -[:TAUGHT]-> (c)
+                    """
             
-        
+            result = self._session.run(query, parameters = {
+                "course_id": course["course_id"],
+                "semester_id": course["semester"],
+                "professor_id": self._id,
+                "professor_name": professor["name"]
+            })
+
+        self._id = self._id + 1
+
+    def create_constraints(self):
+        query = """
+                CREATE CONSTRAINT ON (p:Professor)
+                ASSERT p.id IS UNIQUE
+                """
+
+        self._session.run(query, parameters = {})
+
+    def fetch_and_create(self):
+        page = 1
+
+        while(True):
+            time.sleep(60)
+            api_url = "https://api.umd.io/v1/professors?page={}".format(page)
+            print(api_url)
+            try:
+                res = requests.get(api_url)
+            except:
+                print("FAILED REQUEST - " + api_url)
+                sleep(600)
+                print("CONTINUING")
+                continue
+            page = page + 1
+            data = res.json()
+
+            if (len(data) > 0):
+                for professor in data:
+                    self.__create_professor(professor)
+            else:
+                break
