@@ -14,10 +14,11 @@ class ProfessorDriver:
             with self._driver.session() as session:
                 for course in professor["taught"]:
                     query = """
-                            MATCH (c:Course{id: $course_id}) -[:DURING]-> (s:Semester{id: $semester_id})
-                            MERGE (p:Professor{id: $professor_id, name: $professor_name}), 
-                            (p) -[:TAUGHT]-> (c)
+                            MATCH x = (c:Course{id: $course_id})-[:DURING]->(s:Semester{id: $semester_id})
+                            FOREACH (n IN nodes(x) | MERGE (p:Professor{id: $professor_id, name: $professor_name}), (p)-[:TAUGHT]->(n))
                             """
+
+                    print(query)
                     
                     result = session.run(query, parameters = {
                         "course_id": course["course_id"],
@@ -28,6 +29,7 @@ class ProfessorDriver:
 
                 self._id = self._id + 1
         except:
+            print("CLOSED PROFESSOR")
             self._driver.close()
             self._driver = GraphDatabase.driver(os.getenv("BOLT_URL"), auth=basic_auth(os.getenv("USER"), os.getenv("PASSWORD")))
             self.__create_professor(professor)

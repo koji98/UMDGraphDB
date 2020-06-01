@@ -34,8 +34,8 @@ driver.close()
 
 # CREATE Course Information.
 course_driver = CourseDriver(GraphDatabase.driver(os.getenv("BOLT_URL"), auth=basic_auth(os.getenv("USER"), os.getenv("PASSWORD"))))
-course_driver.fetch_and_create()
-course_driver.close()
+# course_driver.fetch_and_create()
+# course_driver.close()
 
 # CREATE Professor Information.
 professor_driver = ProfessorDriver(GraphDatabase.driver(os.getenv("BOLT_URL"), auth=basic_auth(os.getenv("USER"), os.getenv("PASSWORD"))))
